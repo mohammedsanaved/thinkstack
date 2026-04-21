@@ -15,7 +15,7 @@ export default function DashboardLayout({
       <div className='flex flex-1 overflow-hidden'>
         <Sidebar />
 
-        <main className='flex-1 bg-gray-50 overflow-y-auto'>{children}</main>
+        <main className='flex-1 bg-gray-50 h-auto'>{children}</main>
       </div>
     </div>
   );

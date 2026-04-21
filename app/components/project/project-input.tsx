@@ -4,11 +4,12 @@ import React from 'react';
 import CustomInput from '../prompt/custom-input';
 import { AttachedFile } from '../prompt/prompt-helpers';
 
-export default function ProjectInput({ onSend }: { onSend: (prompt: string, files: AttachedFile[]) => void }) {
+export default function ProjectInput({ onSend }: { onSend: (prompt: string) => void }) {
   return (
     <CustomInput 
-      onSend={onSend}
+      onSend={(prompt) => onSend(prompt)}
       placeholder="How can I help you today?"
+      disableFileUpload={true}
     >
       <div className="flex items-center bg-[#11111b] border border-[#2a2a45] rounded-xl px-3 py-1.5 text-[#8b8b8b] text-sm cursor-pointer hover:bg-[#1e1e2e] transition-colors">
         <span>Sonnet 4.6</span>

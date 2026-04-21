@@ -18,6 +18,7 @@ interface CustomInputProps {
   className?: string;
   children?: React.ReactNode; // For extra layout elements (like model selector)
   maxChars?: number;
+  disableFileUpload?: boolean;
 }
 
 export default function CustomInput({
@@ -27,6 +28,7 @@ export default function CustomInput({
   className = '',
   children,
   maxChars = 4000,
+  disableFileUpload = false,
 }: CustomInputProps) {
   const [files, setFiles] = useState<AttachedFile[]>([]);
   const [prompt, setPrompt] = useState('');
@@ -90,11 +92,17 @@ export default function CustomInput({
     <div className={`w-full ${className}`}>
       <div
         ref={dropZoneRef}
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragOver={(e) => { 
+          if (disableFileUpload) return;
+          e.preventDefault(); 
+          setIsDragging(true); 
+        }}
         onDragLeave={(e) => {
+          if (disableFileUpload) return;
           if (!dropZoneRef.current?.contains(e.relatedTarget as Node)) setIsDragging(false);
         }}
         onDrop={(e) => {
+          if (disableFileUpload) return;
           e.preventDefault();
           setIsDragging(false);
           if (e.dataTransfer.files) addFiles(Array.from(e.dataTransfer.files));
@@ -151,15 +159,17 @@ export default function CustomInput({
         {/* Toolbar row */}
         <div className='flex items-center justify-between px-3 pb-3 pt-1'>
           <div className='flex items-center gap-2'>
-            <Button
-              onClick={() => fileInputRef.current?.click()}
-              variant="ghost"
-              size="icon"
-              title='Attach files'
-              className='h-9 w-9 text-[#7f849c] hover:text-[#89b4fa] hover:bg-[#89b4fa]/8 rounded-lg transition-all cursor-pointer'
-            >
-              <Plus className="w-5 h-5" />
-            </Button>
+            {!disableFileUpload && (
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="ghost"
+                size="icon"
+                title='Attach files'
+                className='h-9 w-9 text-[#7f849c] hover:text-[#89b4fa] hover:bg-[#89b4fa]/8 rounded-lg transition-all cursor-pointer'
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
+            )}
 
             {/* Optional extra elements like Model Selector */}
             {children}

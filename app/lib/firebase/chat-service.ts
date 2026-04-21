@@ -5,6 +5,8 @@ import {
   query,
   where,
   orderBy,
+  getDoc,
+  doc,
 } from 'firebase/firestore';
 
 import { db } from './client';
@@ -32,4 +34,17 @@ export async function getChatsByProject(projectId: string) {
     id: doc.id,
     ...(doc.data() as { title: string; projectId: string }),
   }));
+}
+
+export async function getChat(chatId: string) {
+  const docRef = doc(db, 'chats', chatId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return {
+      id: docSnap.id,
+      ...(docSnap.data() as { title: string; projectId: string }),
+    };
+  }
+  return null;
 }

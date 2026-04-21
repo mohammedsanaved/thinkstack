@@ -11,6 +11,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 
+import {
+  // createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from 'firebase/auth';
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -30,6 +36,22 @@ export default function LoginPage() {
     } catch (err) {
       console.error(err);
       alert('Login failed');
+    }
+  };
+  // 🔐 Google Login
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+
+      const result = await signInWithPopup(auth, provider);
+
+      const token = await result.user.getIdToken();
+      document.cookie = `token=${token}; path=/`;
+
+      router.push('/dashboard');
+    } catch (err) {
+      console.error(err);
+      alert('Google login failed');
     }
   };
 
@@ -59,6 +81,13 @@ export default function LoginPage() {
             onClick={handleLogin}
           >
             Login
+          </Button>
+          <Button
+            variant='outline'
+            className='w-full cursor-pointer hover:bg-gray-100 hover:text-gray-700 duration-300'
+            onClick={handleGoogleLogin}
+          >
+            Continue with Google
           </Button>
         </CardContent>
         <div>
