@@ -61,9 +61,10 @@ export default function InputLayout() {
           <p className='text-[#89b4fa]/70 text-xs mono uppercase tracking-[0.2em] mb-1'>
             ThinkStack · AI Learner
           </p>
-          <h1 className='text-[#cdd6f4] text-2xl font-semibold tracking-tight'>
-            Ask anything from your documents
-          </h1>
+          <h3 className='text-[#cdd6f4] text-2xl font-semibold tracking-tight'>
+            RAG-powered AI chat platform <br /> chat with your documents using a private LLM.
+          </h3>
+
         </div>
 
         {/* ── Shared Input Component ── */}

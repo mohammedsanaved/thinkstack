@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Lock, Plus, FileText, Trash2, Loader2 } from 'lucide-react';
+import { Plus, FileText, Trash2, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getProjectFiles } from '@/app/lib/firebase/project-file-service';
 import { formatSize, FileIcon, getFileType, ACCEPTED_FILE_TYPES } from '../prompt/prompt-helpers';
 
 interface ProjectSidebarProps {
   projectId: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
+export default function ProjectSidebar({ projectId, isOpen, onClose }: ProjectSidebarProps) {
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -75,8 +77,20 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
     }
   };
 
-  return (
-    <aside className="w-[380px] flex flex-col gap-6 min-h-0">
+  /* Hidden file input — shared by both inline and drawer */
+  const fileInput = (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept={ACCEPTED_FILE_TYPES}
+      onChange={handleUpload}
+      className="hidden"
+    />
+  );
+
+  /* ─── Shared content: Instructions + Files ─── */
+  const sidebarContent = (
+    <>
       {/* Instructions Section */}
       <div className="bg-[#1e1e2e]/40 border border-[#2a2a45] rounded-3xl p-6 transition-colors hover:border-[#89b4fa]/20">
         <div className="flex items-center justify-between mb-2">
@@ -108,13 +122,7 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
           </div>
         </div>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={ACCEPTED_FILE_TYPES}
-          onChange={handleUpload}
-          className="hidden"
-        />
+        {fileInput}
 
         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto custom-scrollbar">
           {loading ? (
@@ -133,16 +141,16 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-3 pr-2">
+            <div className="space-y-3">
               {files.map((file) => (
                 <div
                   key={file.id}
                   className="group flex items-center justify-between bg-[#11111b] border border-[#2a2a45] rounded-xl px-4 py-3 hover:border-[#89b4fa]/40 transition-all"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <FileIcon type={getFileType({ name: file.name } as File)} size={16} />
                     <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-medium text-[#cdd6f4] truncate max-w-[140px]">
+                      <span className="text-sm font-medium text-[#cdd6f4] truncate max-w-[200px]">
                         {file.name}
                       </span>
                       <span className="text-[10px] text-[#6c7086]">
@@ -153,7 +161,7 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
 
                   <button
                     onClick={() => handleDelete(file.id)}
-                    className="p-1.5 text-[#6c7086] hover:text-[#f38ba8] hover:bg-[#f38ba8]/10 rounded-lg transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                    className="p-1.5 text-[#6c7086] hover:text-[#f38ba8] hover:bg-[#f38ba8]/10 rounded-lg transition-all opacity-0 group-hover:opacity-100 cursor-pointer shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -163,6 +171,51 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
           )}
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ════════════════════════════════════════════════════════
+          DESKTOP (>= 1024px) — Static inline sidebar
+         ════════════════════════════════════════════════════════ */}
+      <aside className="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 min-h-0">
+        {sidebarContent}
+      </aside>
+
+      {/* ════════════════════════════════════════════════════════
+          MOBILE / TABLET (< 1024px) — Right-side drawer overlay
+         ════════════════════════════════════════════════════════ */}
+
+      {/* Backdrop */}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        onClick={onClose}
+      />
+
+      {/* Drawer panel */}
+      <aside
+        className={`lg:hidden fixed top-0 right-0 h-full w-full md:w-[380px] bg-[#11111b] border-l border-[#2a2a45] z-50 flex flex-col transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+      >
+        {/* Drawer header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#2a2a45]">
+          <h2 className="text-lg font-semibold text-white">Files & Instructions</h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-[#9399b2] hover:bg-[#1e1e2e] hover:text-[#cdd6f4] transition-all cursor-pointer"
+            aria-label="Close drawer"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Drawer body */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 flex flex-col gap-6">
+          {sidebarContent}
+        </div>
+      </aside>
+    </>
   );
 }
