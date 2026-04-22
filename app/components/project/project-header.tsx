@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoreVertical, Star, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, MoreVertical, Star, Edit2, Trash2, PanelRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -17,16 +17,17 @@ interface ProjectHeaderProps {
   id: string;
   name: string;
   description?: string;
+  onOpenDrawer: () => void;
 }
 
-export default function ProjectHeader({ id, name, description }: ProjectHeaderProps) {
+export default function ProjectHeader({ id, name, description, onOpenDrawer }: ProjectHeaderProps) {
   const router = useRouter();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
     <>
-      <div className="flex flex-col gap-4 mb-8">
+      <div className="flex flex-col gap-3 md:gap-4 mb-6 md:mb-8">
         <button
           onClick={() => router.push('/dashboard')}
           className="flex items-center gap-2 text-[#8b8b8b] hover:text-white transition-colors text-sm group cursor-pointer"
@@ -35,17 +36,29 @@ export default function ProjectHeader({ id, name, description }: ProjectHeaderPr
           All projects
         </button>
 
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-4xl font-semibold text-white tracking-tight mb-2">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            {/* Responsive title: text-2xl mobile, text-3xl tablet, text-4xl desktop */}
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white tracking-tight mb-1 md:mb-2 truncate">
               {name}
             </h1>
-            <p className="text-[#8b8b8b] text-lg">
+            <p className="text-[#8b8b8b] text-base lg:text-lg truncate">
               {description || 'Description Not Added'}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2 shrink-0">
+            {/* Files & Instructions drawer trigger — only on mobile/tablet */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onOpenDrawer}
+              className="lg:hidden text-[#8b8b8b] hover:text-[#89b4fa] hover:bg-[#89b4fa]/10 cursor-pointer"
+              title="Files & Instructions"
+            >
+              <PanelRight size={20} />
+            </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-[#8b8b8b] hover:text-white hover:bg-white/5 cursor-pointer">
