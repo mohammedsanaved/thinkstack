@@ -16,6 +16,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -59,6 +60,14 @@ export default function LoginPage() {
     <div className='flex items-center justify-center h-screen'>
       <Card className='w-[350px] p-4'>
         <CardContent className='space-y-4'>
+          <div className='flex justify-center mb-4'>
+            <Image
+              src="/thinkstack_logo_1024.png"
+              alt="Logo"
+              width={64}
+              height={64}
+            />
+          </div>
           <h2 className='text-xl font-semibold text-center'>
             ThinkStack Login
           </h2>

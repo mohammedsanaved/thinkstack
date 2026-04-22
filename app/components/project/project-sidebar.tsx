@@ -76,7 +76,7 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
   };
 
   return (
-    <aside className="w-[380px] flex flex-col gap-6">
+    <aside className="w-[380px] flex flex-col gap-6 min-h-0">
       {/* Instructions Section */}
       <div className="bg-[#1e1e2e]/40 border border-[#2a2a45] rounded-3xl p-6 transition-colors hover:border-[#89b4fa]/20">
         <div className="flex items-center justify-between mb-2">
@@ -91,7 +91,7 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
       </div>
 
       {/* Files Section */}
-      <div className="bg-[#1e1e2e]/40 border border-[#2a2a45] rounded-3xl p-6 flex-1 flex flex-col transition-colors hover:border-[#89b4fa]/20">
+      <div className="bg-[#1e1e2e]/40 border border-[#2a2a45] rounded-3xl p-6 flex-1 flex flex-col min-h-0 transition-colors hover:border-[#89b4fa]/20">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-white font-medium text-lg">Files</h3>
           <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
           className="hidden"
         />
 
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto custom-scrollbar">
           {loading ? (
             <div className="flex-1 flex items-center justify-center py-8">
               <Loader2 className="w-6 h-6 text-[#89b4fa] animate-spin" />
@@ -133,7 +133,7 @@ export default function ProjectSidebar({ projectId }: ProjectSidebarProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3 pr-2">
               {files.map((file) => (
                 <div
                   key={file.id}

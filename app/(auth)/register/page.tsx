@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -60,6 +61,14 @@ export default function RegisterPage() {
       <div className='flex items-center justify-center h-screen'>
         <Card className='w-[350px] p-4'>
           <CardContent className='space-y-4'>
+            <div className='flex justify-center mb-4'>
+              <Image
+                src="/thinkstack_logo_1024.png"
+                alt="Logo"
+                width={64}
+                height={64}
+              />
+            </div>
             <h2 className='text-xl font-semibold text-center'>
               Create your ThinkStack account
             </h2>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import CustomInput from './custom-input';
 import { AttachedFile } from './prompt-helpers';
+import Image from 'next/image';
 
 export default function InputLayout() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -44,6 +45,17 @@ export default function InputLayout() {
 
       {/* ── Page wrapper ── */}
       <div className='min-h-screen bg-[#11111b] flex flex-col items-center justify-center px-4 py-10'>
+        <div className='flex items-center gap-3 mb-6'>
+          <Image
+            src="/thinkstack_logo_1024.png"
+            alt="Logo"
+            width={128}
+            height={128}
+          />
+          {/* <h1 className='text-xl font-bold bg-gradient-to-r from-[#89b4fa] to-[#74c7ec] bg-clip-text text-transparent'>
+            ThinkStack
+          </h1> */}
+        </div>
         {/* ── Header label ── */}
         <div className='mb-6 text-center animate-fade-in'>
           <p className='text-[#89b4fa]/70 text-xs mono uppercase tracking-[0.2em] mb-1'>
@@ -55,19 +67,19 @@ export default function InputLayout() {
         </div>
 
         {/* ── Shared Input Component ── */}
-        <div className="w-full max-w-2xl">
-          <CustomInput 
+        {/* <div className="w-full max-w-2xl">
+          <CustomInput
             onSend={handleGenerate}
             isGenerating={isGenerating}
             placeholder="Ask a question, summarise, explain a concept…"
           />
-        </div>
+        </div> */}
 
         {/* ── Helper text ── */}
-        <p className='mt-3 text-[11px] text-[#45475a] text-center animate-fade-in'>
+        {/* <p className='mt-3 text-[11px] text-[#45475a] text-center animate-fade-in'>
           Shift + Enter for new line · Drag & drop files directly · Enter to
           send
-        </p>
+        </p> */}
       </div>
     </>
   );

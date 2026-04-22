@@ -29,7 +29,7 @@ export default function ProjectHeader({ id, name, description }: ProjectHeaderPr
       <div className="flex flex-col gap-4 mb-8">
         <button
           onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2 text-[#8b8b8b] hover:text-white transition-colors text-sm group"
+          className="flex items-center gap-2 text-[#8b8b8b] hover:text-white transition-colors text-sm group cursor-pointer"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           All projects
@@ -52,19 +52,19 @@ export default function ProjectHeader({ id, name, description }: ProjectHeaderPr
                   <MoreVertical size={20} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-[#1a1a2e] border-[#2a2a45] text-white">
+              <DropdownMenuContent align="end" className="bg-[#0b0b10] border-[#1e1e2e] text-[#cdd6f4]">
                 <DropdownMenuItem
                   onClick={() => setShowEditModal(true)}
-                  className="gap-2 cursor-pointer focus:bg-white/5 focus:text-white"
+                  className="gap-2 cursor-pointer focus:bg-[#1e1e2e] focus:text-[#89b4fa]"
                 >
                   <Edit2 size={14} />
                   Edit Project
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => setShowDeleteDialog(true)}
-                  className="gap-2 cursor-pointer text-red-400 focus:bg-red-500/10 focus:text-red-400"
+                  className="gap-2 cursor-pointer text-[#f38ba8] focus:bg-[#f38ba8]/10 focus:text-[#f38ba8]"
                 >
-                  <Trash2 size={14} className='focus:bg-red-500' />
+                  <Trash2 size={14} className='text-[#f38ba8]' />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>

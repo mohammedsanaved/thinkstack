@@ -3,19 +3,17 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
+  const { pathname } = req.nextUrl;
 
-  const isAuthPage =
-    req.nextUrl.pathname.startsWith('/login') ||
-    req.nextUrl.pathname.startsWith('/register');
+  console.log(`Middleware: ${pathname} | Token: ${!!token}`);
 
-  const isDashboard = req.nextUrl.pathname.startsWith('/dashboard');
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isDashboard = pathname.startsWith('/dashboard');
 
-  // 🔒 If not logged in → block dashboard
   if (!token && isDashboard) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  // 🔁 If logged in → prevent going to login/register
   if (token && isAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }

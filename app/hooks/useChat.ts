@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { addMessage } from "@/app/lib/firebase/message-service";
 import { AttachedFile } from "@/app/components/prompt/prompt-helpers";
 
@@ -17,12 +17,25 @@ interface UseChatProps {
 export function useChat({ projectId, chatId, userId, initialMessages = [] }: UseChatProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const stopGenerating = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setLoading(false);
+    }
+  }, []);
 
   const sendMessage = useCallback(async (input: string, files?: AttachedFile[]) => {
     if (!input && (!files || files.length === 0)) return;
 
     setLoading(true);
     let finalContent = input;
+
+    // Create a new AbortController for this request
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
       // 1. Parse files if attached
@@ -35,10 +48,12 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
               const res = await fetch("/api/parse-file", {
                 method: "POST",
                 body: formData,
+                signal: controller.signal,
               });
               const data = await res.json();
               return `--- File: ${f.name} ---\n${data.text}\n`;
             } catch (err) {
+              if (err instanceof Error && err.name === 'AbortError') throw err;
               console.error(`Failed to parse file ${f.name}:`, err);
               return `--- File: ${f.name} (Error parsing file) ---`;
             }
@@ -72,8 +87,8 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
           chatId,
           userId,
         }),
+        signal: controller.signal,
       });
-      console.log(res, "response from usechat");
 
       if (!res.ok) throw new Error("Failed to fetch chat response");
 
@@ -99,7 +114,6 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
           updated[updated.length - 1] = { role: "assistant", content: aiContent };
           return updated;
         });
-        console.log(aiContent, "ai content from usechat");
       }
 
       // Save AI response to DB
@@ -111,12 +125,16 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
       });
 
     } catch (err) {
-      console.error("Chat Error:", err);
-      setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.log("Chat generation aborted");
+      } else {
+        console.error("Chat Error:", err);
+        setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
-    console.log(messages, "messages from usechat");
   }, [projectId, chatId, userId]);
 
   const generateResponse = useCallback(async (customMessages?: Message[]) => {
@@ -127,6 +145,8 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
     if (lastMessage.role !== 'user') return;
 
     setLoading(true);
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
       const res = await fetch("/api/chat", {
@@ -138,6 +158,7 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
           chatId,
           userId,
         }),
+        signal: controller.signal,
       });
 
       if (!res.ok) throw new Error("Failed to fetch chat response");
@@ -173,12 +194,17 @@ export function useChat({ projectId, chatId, userId, initialMessages = [] }: Use
       });
 
     } catch (err) {
-      console.error("Chat Error:", err);
-      setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.log("Chat generation aborted");
+      } else {
+        console.error("Chat Error:", err);
+        setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      }
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   }, [projectId, chatId, userId, messages]);
 
-  return { messages, setMessages, sendMessage, generateResponse, loading };
+  return { messages, setMessages, sendMessage, generateResponse, loading, stopGenerating };
 }

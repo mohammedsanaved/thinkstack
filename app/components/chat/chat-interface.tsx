@@ -10,7 +10,7 @@ import ProjectInput from '../project/project-input';
 import { db, auth } from '@/app/lib/firebase/client';
 import { doc, getDoc } from 'firebase/firestore';
 import { getChat } from '@/app/lib/firebase/chat-service';
-import { Bot, User, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { Bot, User, ChevronRight, LayoutDashboard, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import rehypeRaw from "rehype-raw";
@@ -27,9 +27,10 @@ export default function ChatInterface({
   const [project, setProject] = useState<any>(null);
   const [chatData, setChatData] = useState<any>(null);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [transcript, setTranscript] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, setMessages, sendMessage, generateResponse, loading: isGenerating } = useChat({
+  const { messages, setMessages, sendMessage, generateResponse, loading: isGenerating, stopGenerating } = useChat({
     projectId,
     chatId,
     userId: auth.currentUser?.uid,
@@ -196,16 +197,16 @@ export default function ChatInterface({
                                 <div className="bg-[#181825] border border-[#313244] rounded-xl overflow-hidden">
                                   <div className="bg-[#313244]/30 px-3 py-1.5 flex items-center justify-between border-b border-[#313244]">
                                     <span className="text-[10px] uppercase tracking-widest text-[#89b4fa] font-black">Logic Transcript</span>
-                                    <div className="flex gap-1">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-[#f38ba8]/40" />
-                                      <div className="w-1.5 h-1.5 rounded-full bg-[#fab387]/40" />
-                                      <div className="w-1.5 h-1.5 rounded-full bg-[#a6e3a1]/40" />
+                                    <div className="flex gap-1 duration-300">
+                                      {transcript ? <ChevronDown onClick={() => setTranscript(false)} /> : <ChevronRight onClick={() => setTranscript(true)} />}
                                     </div>
                                   </div>
-                                  <div className="p-3 text-xs text-[#9399b2] italic leading-relaxed whitespace-pre-wrap font-mono">
-                                    {thoughts}
-                                    {isGenerating && i === messages.length - 1 && <span className="inline-block w-1 h-3 bg-[#89b4fa] ml-1 animate-pulse" />}
-                                  </div>
+                                  {transcript && (
+                                    <div className="p-3 text-xs text-[#9399b2] italic leading-relaxed whitespace-pre-wrap font-mono duration-300 overflow-hidden">
+                                      {thoughts}
+                                      {isGenerating && i === messages.length - 1 && <span className="inline-block w-1 h-3 bg-[#89b4fa] ml-1 animate-pulse" />}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                               {cleanContent ? (
@@ -252,7 +253,11 @@ export default function ChatInterface({
         <div className="bg-gradient-to-t from-[#0b0b10] via-[#0b0b10] to-transparent pt-2 pb-2 px-6">
           <div className="max-w-4xl mx-auto relative">
             <div className="absolute -top-10 left-0 right-0 h-10 bg-gradient-to-t from-[#0b0b10] to-transparent pointer-events-none" />
-            <ProjectInput onSend={handleSend} />
+            <ProjectInput 
+              onSend={handleSend} 
+              onStop={stopGenerating}
+              isGenerating={isGenerating}
+            />
             <p className="text-[10px] text-center text-[#45475a] mt-4 uppercase tracking-widest font-medium">
               Thinking Stack AI • Powered by Qwen 2.5 Coder
             </p>
